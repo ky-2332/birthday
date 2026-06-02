@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Happy Birthday 王逸宁</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a1a;overflow:hidden;height:100vh;width:100vw;font-family:'PingFang SC','Microsoft YaHei',sans-serif;touch-action:none}
+canvas{position:fixed;top:0;left:0;z-index:0}
+.overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;display:flex;align-items:center;justify-content:center;flex-direction:column}
+/* COUNTDOWN */
+.countdown{font-size:30vw;font-weight:900;color:#fff;text-shadow:0 0 60px rgba(255,200,100,.8),0 0 120px rgba(255,150,50,.5),0 0 200px rgba(255,100,30,.3);opacity:0;transition:all .3s ease-out;position:absolute}
+.countdown.show{opacity:1}
+.countdown.pulse{transform:scale(1.4)}
+/* CAKE CONTAINER */
+.cake-wrap{position:absolute;bottom:-500px;transition:bottom 1.2s cubic-bezier(.34,1.56,.64,1);display:flex;flex-direction:column;align-items:center}
+.cake-wrap.rise{bottom:15%}
+/* CAKE SVG */
+.cake-svg{width:280px;height:280px}
+/* TEXT */
+.birthday-text{font-size:3rem;font-weight:900;color:#ff6b8a;text-shadow:0 0 20px rgba(255,107,138,.6),0 0 40px rgba(255,150,180,.4);opacity:0;transform:translateY(20px);transition:all .8s ease .5s;margin-top:-20px}
+.birthday-text.show{opacity:1;transform:translateY(0)}
+.name-text{font-size:1.8rem;color:#d4a0ff;text-shadow:0 0 15px rgba(180,130,255,.6);opacity:0;transform:translateY(20px);transition:all .8s ease 1s;margin-top:10px}
+.name-text.show{opacity:1;transform:translateY(0)}
+/* SPARKLES */
+.sparkle{position:absolute;width:6px;height:6px;background:#fff;border-radius:50%;animation:sparkleFloat 2s ease-out forwards;opacity:0}
+@keyframes sparkleFloat{
+  0%{opacity:1;transform:translate(0,0) scale(1)}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0)}
+}
+/* FALLING BALLOONS */
+.balloon{position:absolute;pointer-events:none;z-index:2;animation:fallDown var(--dur) linear forwards}
+@keyframes fallDown{
+  0%{transform:translateY(-120px) rotate(0deg) scale(1);opacity:0}
+  5%{opacity:1}
+  80%{opacity:.9}
+  100%{transform:translateY(var(--endY)) rotate(var(--rot)) scale(.7);opacity:0}
+}
+.balloon svg{width:var(--sz);height:auto}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="overlay" id="overlay">
+  <div class="countdown" id="cd">3</div>
+  <div class="cake-wrap" id="cakeWrap">
+    <svg class="cake-svg" viewBox="0 -120 300 420">
+      <defs>
+        <radialGradient id="glowGrad"><stop offset="0%" stop-color="#ffa040" stop-opacity="0.6"/><stop offset="100%" stop-color="#ffa040" stop-opacity="0"/></radialGradient>
+        <radialGradient id="glowGrad2"><stop offset="0%" stop-color="#ffd080" stop-opacity="0.4"/><stop offset="100%" stop-color="#ffd080" stop-opacity="0"/></radialGradient>
+      </defs>
+      <!-- Plate -->
+      <ellipse cx="150" cy="255" rx="120" ry="18" fill="#e8e0d8" stroke="#c8c0b8" stroke-width="2"/>
+      <!-- Cake body -->
+      <rect x="55" y="165" width="190" height="85" rx="12" fill="#ffb8c6" stroke="#e890a0" stroke-width="2"/>
+      <!-- Cake bottom stripe -->
+      <rect x="55" y="225" width="190" height="25" rx="0" fill="#ffd0da"/>
+      <!-- Frosting -->
+      <ellipse cx="65" cy="165" rx="26" ry="12" fill="#fff" stroke="#eee" stroke-width="1.5"/>
+      <ellipse cx="95" cy="160" rx="24" ry="12" fill="#fff" stroke="#eee" stroke-width="1.5"/>
+      <ellipse cx="125" cy="162" rx="22" ry="11" fill="#fff" stroke="#eee" stroke-width="1.5"/>
+      <ellipse cx="150" cy="160" rx="22" ry="11" fill="#fff" stroke="#eee" stroke-width="1.5"/>
+      <ellipse cx="175" cy="162" rx="22" ry="11" fill="#fff" stroke="#eee" stroke-width="1.5"/>
+      <ellipse cx="205" cy="160" rx="24" ry="12" fill="#fff" stroke="#eee" stroke-width="1.5"/>
+      <ellipse cx="235" cy="165" rx="26" ry="12" fill="#fff" stroke="#eee" stroke-width="1.5"/>
+      <!-- Frosting base -->
+      <rect x="43" y="150" width="214" height="20" rx="8" fill="#fff8fa" stroke="#eee" stroke-width="1"/>
+      <!-- Redraw frosting bumps on top -->
+      <ellipse cx="65" cy="150" rx="26" ry="12" fill="#fff" stroke="#eee" stroke-width="1.5"/>
+      <ellipse cx="95" cy="145" rx="24" ry="12" fill="#fff" stroke="#eee" stroke-width="1.5"/>
+      <ellipse cx="125" cy="147" rx="22" ry="11" fill="#fff" stroke="#eee" stroke-width="1.5"/>
+      <ellipse cx="150" cy="145" rx="22" ry="11" fill="#fff" stroke="#eee" stroke-width="1.5"/>
+      <ellipse cx="175" cy="147" rx="22" ry="11" fill="#fff" stroke="#eee" stroke-width="1.5"/>
+      <ellipse cx="205" cy="145" rx="24" ry="12" fill="#fff" stroke="#eee" stroke-width="1.5"/>
+      <ellipse cx="235" cy="150" rx="26" ry="12" fill="#fff" stroke="#eee" stroke-width="1.5"/>
+      <!-- Candles -->
+      <!-- Flame Glows -->
+      <ellipse cx="83" cy="55" rx="30" ry="35" fill="url(#glowGrad)"/>
+      <ellipse cx="115" cy="47" rx="30" ry="35" fill="url(#glowGrad)"/>
+      <ellipse cx="150" cy="53" rx="30" ry="35" fill="url(#glowGrad)"/>
+      <ellipse cx="180" cy="47" rx="30" ry="35" fill="url(#glowGrad)"/>
+      <ellipse cx="213" cy="55" rx="30" ry="35" fill="url(#glowGrad)"/>
+      <!-- Candle 1 -->
+      <rect x="78" y="80" width="10" height="65" rx="3" fill="#ff6b6b"/>
+      <rect x="78" y="95" width="10" height="4" fill="#fff" opacity=".4"/>
+      <rect x="78" y="110" width="10" height="4" fill="#fff" opacity=".4"/>
+      <line x1="83" y1="80" x2="83" y2="60" stroke="#4a3020" stroke-width="2"/>
+      <ellipse cx="83" cy="57" rx="8" ry="12" fill="#ffa040"/>
+      <ellipse cx="83" cy="55" rx="5" ry="7" fill="#ffd080"/>
+      <!-- Candle 2 -->
+      <rect x="110" y="72" width="10" height="73" rx="3" fill="#ffd93d"/>
+      <rect x="110" y="87" width="10" height="4" fill="#fff" opacity=".4"/>
+      <rect x="110" y="102" width="10" height="4" fill="#fff" opacity=".4"/>
+      <line x1="115" y1="72" x2="115" y2="52" stroke="#4a3020" stroke-width="2"/>
+      <ellipse cx="115" cy="49" rx="8" ry="12" fill="#ffa040"/>
+      <ellipse cx="115" cy="47" rx="5" ry="7" fill="#ffd080"/>
+      <!-- Candle 3 -->
+      <rect x="145" y="78" width="10" height="67" rx="3" fill="#6bcb77"/>
+      <rect x="145" y="93" width="10" height="4" fill="#fff" opacity=".4"/>
+      <rect x="145" y="108" width="10" height="4" fill="#fff" opacity=".4"/>
+      <line x1="150" y1="78" x2="150" y2="58" stroke="#4a3020" stroke-width="2"/>
+      <ellipse cx="150" cy="55" rx="8" ry="12" fill="#ffa040"/>
+      <ellipse cx="150" cy="53" rx="5" ry="7" fill="#ffd080"/>
+      <!-- Candle 4 -->
+      <rect x="175" y="72" width="10" height="73" rx="3" fill="#4d96ff"/>
+      <rect x="175" y="87" width="10" height="4" fill="#fff" opacity=".4"/>
+      <rect x="175" y="102" width="10" height="4" fill="#fff" opacity=".4"/>
+      <line x1="180" y1="72" x2="180" y2="52" stroke="#4a3020" stroke-width="2"/>
+      <ellipse cx="180" cy="49" rx="8" ry="12" fill="#ffa040"/>
+      <ellipse cx="180" cy="47" rx="5" ry="7" fill="#ffd080"/>
+      <!-- Candle 5 -->
+      <rect x="208" y="80" width="10" height="65" rx="3" fill="#ff8fab"/>
+      <rect x="208" y="95" width="10" height="4" fill="#fff" opacity=".4"/>
+      <rect x="208" y="110" width="10" height="4" fill="#fff" opacity=".4"/>
+      <line x1="213" y1="80" x2="213" y2="60" stroke="#4a3020" stroke-width="2"/>
+      <ellipse cx="213" cy="57" rx="8" ry="12" fill="#ffa040"/>
+      <ellipse cx="213" cy="55" rx="5" ry="7" fill="#ffd080"/>
+      <!-- Sprinkles -->
+      <rect x="70" y="185" width="8" height="3" rx="2" fill="#ffd93d" transform="rotate(-20 74 186)"/>
+      <rect x="100" y="195" width="8" height="3" rx="2" fill="#4d96ff" transform="rotate(15 104 196)"/>
+      <rect x="130" y="180" width="8" height="3" rx="2" fill="#6bcb77" transform="rotate(-10 134 181)"/>
+      <rect x="160" y="200" width="8" height="3" rx="2" fill="#ff6b6b" transform="rotate(30 164 201)"/>
+      <rect x="190" y="188" width="8" height="3" rx="2" fill="#ff8fab" transform="rotate(-25 194 189)"/>
+      <rect x="210" y="198" width="8" height="3" rx="2" fill="#d4a0ff" transform="rotate(10 214 199)"/>
+      <rect x="85" y="210" width="8" height="3" rx="2" fill="#ffa040" transform="rotate(-15 89 211)"/>
+      <rect x="175" y="210" width="8" height="3" rx="2" fill="#4d96ff" transform="rotate(20 179 211)"/>
+      <rect x="145" y="215" width="8" height="3" rx="2" fill="#ff6b6b" transform="rotate(-5 149 216)"/>
+      <rect x="220" y="185" width="8" height="3" rx="2" fill="#ffd93d" transform="rotate(25 224 186)"/>
+    </svg>
+    <div class="birthday-text" id="hb">Happy Birthday</div>
+    <div class="name-text" id="name">王逸宁 ✨</div>
+  </div>
+</div>
+
+<script>
+// ====== STARRY SKY ======
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+let W, H, stars = [], shootingStars = [];
+
+function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight }
+resize(); window.addEventListener('resize', resize);
+
+// Generate stars
+for(let i=0;i<200;i++){
+  stars.push({x:Math.random()*W, y:Math.random()*H, r:Math.random()*2+.5,
+    twinkle:Math.random()*Math.PI*2, speed:.01+Math.random()*.03, alpha:.3+Math.random()*.7})
+}
+// Bonus bright stars cluster above cake area - store for star-shaped drawing
+let bonusStars = [];
+for(let i=0;i<30;i++){
+  bonusStars.push({
+    x:W*.2+Math.random()*W*.6, y:Math.random()*H*.3,
+    r:3+Math.random()*5, twinkle:Math.random()*Math.PI*2,
+    speed:.025+Math.random()*.05, alpha:.6+Math.random()*.4
+  })
+}
+
+function spawnShootingStar(){
+  shootingStars.push({
+    x:Math.random()*W*.8, y:Math.random()*H*.3,
+    vx:3+Math.random()*5, vy:1+Math.random()*3,
+    life:1, len:60+Math.random()*100, decay:.01+Math.random()*.02
+  })
+}
+setInterval(spawnShootingStar, 3000+Math.random()*5000);
+
+function drawStarShape(ctx, cx, cy, r, ir){
+  ctx.beginPath();
+  for(let i=0;i<5;i++){
+    let a=i*Math.PI*2/5-Math.PI/2;
+    let x=cx+Math.cos(a)*r, y=cy+Math.sin(a)*r;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    let ia=a+Math.PI/5;
+    ctx.lineTo(cx+Math.cos(ia)*ir, cy+Math.sin(ia)*ir);
+  }
+  ctx.closePath();
+}
+
+function drawStars(){
+  ctx.clearRect(0,0,W,H);
+  // Deep space gradient
+  let g = ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,W*.7);
+  g.addColorStop(0,'#0d0d2b'); g.addColorStop(.5,'#0a0a1f'); g.addColorStop(1,'#050510');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+  // Stars
+  stars.forEach(s=>{
+    s.twinkle+=s.speed;
+    let a=s.alpha*(.5+.5*Math.sin(s.twinkle));
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(255,255,255,${a})`; ctx.fill();
+    // Glow - bigger stars get brighter glow
+    if(s.r>1.2){
+      let glowR=s.r*4, glowAlpha=a*(s.r>3?.3:.15);
+      ctx.beginPath(); ctx.arc(s.x,s.y,glowR,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,220,150,${glowAlpha})`; ctx.fill();
+    }
+  });
+  // Draw star-shaped bonus stars
+  bonusStars.forEach(s=>{
+    s.twinkle+=s.speed;
+    let a=s.alpha*(.5+.5*Math.sin(s.twinkle));
+    // Soft gradient fill - no hard edges
+    let sg=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r);
+    sg.addColorStop(0,`rgba(255,240,200,${a})`);
+    sg.addColorStop(.6,`rgba(255,200,100,${a*.7})`);
+    sg.addColorStop(1,`rgba(255,180,80,${a*.2})`);
+    drawStarShape(ctx, s.x, s.y, s.r, s.r*.4);
+    ctx.fillStyle=sg; ctx.fill();
+    // Soft outer glow
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r*2.5,0,Math.PI*2);
+    let gg=ctx.createRadialGradient(s.x,s.y,s.r*.3,s.x,s.y,s.r*2.5);
+    gg.addColorStop(0,`rgba(255,220,150,${a*.15})`);
+    gg.addColorStop(1,'rgba(255,220,150,0)');
+    ctx.fillStyle=gg; ctx.fill();
+  });
+
+  // Shooting stars
+  shootingStars.forEach((ss,i)=>{
+    ss.x+=ss.vx; ss.y+=ss.vy; ss.life-=ss.decay;
+    let grad=ctx.createLinearGradient(ss.x,ss.y,ss.x-ss.len*.7,ss.y-ss.len*.3);
+    grad.addColorStop(0,`rgba(255,255,255,${ss.life})`);
+    grad.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.beginPath(); ctx.moveTo(ss.x,ss.y);
+    ctx.lineTo(ss.x-ss.len*.7,ss.y-ss.len*.3);
+    ctx.strokeStyle=grad; ctx.lineWidth=1.5; ctx.stroke();
+    if(ss.life<=0) shootingStars.splice(i,1);
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+// ====== ANIMATION SEQUENCE ======
+const cd = document.getElementById('cd');
+const cakeWrap = document.getElementById('cakeWrap');
+const hb = document.getElementById('hb');
+const nameEl = document.getElementById('name');
+
+function sparkle(x,y){
+  for(let i=0;i<8;i++){
+    let s=document.createElement('div'); s.className='sparkle';
+    s.style.left=x+'px'; s.style.top=y+'px';
+    s.style.setProperty('--dx',(Math.random()-.5)*120+'px');
+    s.style.setProperty('--dy',(Math.random()-.5)*120+'px');
+    s.style.animationDuration=(1+Math.random()*1.5)+'s';
+    s.style.background=['#ffd700','#ff6b8a','#fff','#4d96ff','#ff8fab'][Math.floor(Math.random()*5)];
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),2000);
+  }
+}
+
+function doCountdown(num, cb){
+  cd.textContent=num; cd.className='countdown show';
+  setTimeout(()=>{ cd.className='countdown show pulse'; },100);
+  setTimeout(()=>{
+    cd.className='countdown';
+    if(cb) setTimeout(cb,300);
+  },800);
+}
+
+function showCake(){
+  cakeWrap.classList.add('rise');
+  setTimeout(()=>{ hb.classList.add('show'); nameEl.classList.add('show'); },800);
+  // Burst sparkles
+  let cx=window.innerWidth/2, cy=window.innerHeight*.25;
+  for(let i=0;i<5;i++) setTimeout(()=>sparkle(cx+(Math.random()-.5)*200,cy+(Math.random()-.5)*100),i*200);
+  // Continuous sparkles
+  let sid=setInterval(()=>sparkle(cx+(Math.random()-.5)*250,cy+(Math.random()-.5)*150),400);
+  setTimeout(()=>clearInterval(sid),6000);
+  // Spawn falling balloons
+  spawnBalloons();
+}
+
+function spawnBalloons(){
+  const colors=['#ff4d6a','#ffd93d','#c77dff','#ff8fab','#4d96ff','#ff6b6b','#ffa040'];
+  const count=20;
+  for(let i=0;i<count;i++){
+    setTimeout(()=>{
+      let b=document.createElement('div'); b.className='balloon';
+      let sz=45+Math.random()*40;
+      b.style.setProperty('--sz',sz+'px');
+      // Even horizontal spread
+      let col=i%Math.ceil(count/4);
+      let row=Math.floor(i/Math.ceil(count/4));
+      let baseLeft=5+(col/(Math.ceil(count/4)-1))*90;
+      b.style.left=(baseLeft+(Math.random()-0.5)*8)+'%';
+      b.style.setProperty('--endY',(window.innerHeight+100)+'px');
+      b.style.setProperty('--dur',(7+Math.random()*5)+'s');
+      b.style.setProperty('--rot',(Math.random()*40-20)+'deg');
+      let c=colors[i%colors.length];
+      let hc=c.replace('ff','e0').replace('4d','30').replace('d9','b0').replace('c7','a0').replace('8f','70').replace('6b','50').replace('a0','80');
+      b.innerHTML=`<svg viewBox='0 -6 60 90'><ellipse cx='30' cy='28' rx='22' ry='28' fill='${c}' stroke='${hc}' stroke-width='1.5'/><polygon points='30,56 27,64 33,64' fill='${c}'/><path d='M30 64 Q28 78 30 90' stroke='rgba(255,255,255,0.5)' stroke-width='0.8' fill='none'/><ellipse cx='30' cy='26' rx='7' ry='3.5' fill='rgba(255,255,255,0.3)'/></svg>`;
+      document.body.appendChild(b);
+      setTimeout(()=>b.remove(), 15000);
+    }, i*250);
+  }
+}
+
+// Play sequence after a short delay
+setTimeout(()=>{
+  doCountdown('3',()=>{
+    doCountdown('2',()=>{
+      doCountdown('1',()=>{
+        cd.style.display='none';
+        showCake();
+      });
+    });
+  });
+},500);
+</script>
+</body>
+</html>
