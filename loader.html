@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Loading...</title>
+<style>
+body{background:#0a0a1a;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:'PingFang SC','Microsoft YaHei',sans-serif}
+.loader{text-align:center}
+.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,.2);border-top-color:#ff6b8a;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="loader"><div class="spinner"></div><p>加载中...</p></div>
+<script>
+const name = new URLSearchParams(location.search).get('name') || 'wanghang';
+const url = 'https://raw.githubusercontent.com/ky-2332/birthday/main/' + name + '.html';
+fetch(url)
+  .then(r => r.text())
+  .then(html => {
+    document.open();
+    document.write(html);
+    document.close();
+  })
+  .catch(() => {
+    document.querySelector('.loader').innerHTML = '<p>加载失败，请检查链接</p>';
+  });
+</script>
+</body>
+</html>
